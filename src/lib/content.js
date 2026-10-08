@@ -1,7 +1,8 @@
 import { parseDeckFile } from './deckFile.js';
+import { DECKS_DIR, COOL_CARDS_FILE } from '../config.js';
 
-// Все файлы колод подхватываются автоматически — достаточно положить .md в content/decks
-const deckFiles = import.meta.glob('/content/decks/*.md', {
+// Весь контент сайта лежит в папке content/ и вшивается в сборку
+const contentFiles = import.meta.glob(['/content/decks/*.md', '/content/cards.json'], {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -9,13 +10,12 @@ const deckFiles = import.meta.glob('/content/decks/*.md', {
 
 const normalize = (raw) => raw.replace(/\r\n/g, '\n').trim();
 
-const built = new Map(
-  Object.entries(deckFiles).map(([path, raw]) => [path.split('/').pop().replace(/\.md$/, ''), normalize(raw)]),
-);
+// путь в репозитории (content/decks/krenko.md) -> текст файла
+const built = new Map(Object.entries(contentFiles).map(([path, raw]) => [path.slice(1), normalize(raw)]));
 
 // Пока GitHub пересобирает сайт (1–2 минуты), редактор видит свои правки из localStorage.
 // Как только сборка догнала — локальная копия удаляется.
-const PENDING_KEY = 'gvozd:pending-decks';
+const PENDING_KEY = 'gvozd:pending-files';
 const PENDING_TTL = 60 * 60 * 1000;
 
 function readPending() {
@@ -34,34 +34,48 @@ function writePending(pending) {
   }
 }
 
-/** raw = null означает, что колода удалена. */
-export function setPendingDeck(slug, raw) {
+/** Запомнить только что сохранённый файл. raw = null — файл удалён. */
+export function setPending(path, raw) {
   const pending = readPending();
-  pending[slug] = { raw: raw === null ? null : normalize(raw), t: Date.now() };
+  pending[path] = { raw: raw === null ? null : normalize(raw), t: Date.now() };
   writePending(pending);
 }
 
-export function getDecks() {
+function currentFiles() {
   const files = new Map(built);
   const pending = readPending();
   let changed = false;
 
-  for (const [slug, { raw, t }] of Object.entries(pending)) {
-    const caughtUp = raw === null ? !files.has(slug) : files.get(slug) === raw;
+  for (const [path, { raw, t }] of Object.entries(pending)) {
+    const caughtUp = raw === null ? !files.has(path) : files.get(path) === raw;
     if (caughtUp || Date.now() - t > PENDING_TTL) {
-      delete pending[slug];
+      delete pending[path];
       changed = true;
     } else if (raw === null) {
-      files.delete(slug);
+      files.delete(path);
     } else {
-      files.set(slug, raw);
+      files.set(path, raw);
     }
   }
   if (changed) writePending(pending);
+  return files;
+}
 
-  return [...files]
-    .map(([slug, raw]) => parseDeckFile(raw, slug))
+export function getDecks() {
+  return [...currentFiles()]
+    .filter(([path]) => path.startsWith(`${DECKS_DIR}/`) && path.endsWith('.md'))
+    .map(([path, raw]) => parseDeckFile(raw, path.slice(DECKS_DIR.length + 1, -3)))
     .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 }
 
 export const findDeck = (slug) => getDecks().find((d) => d.slug === slug);
+
+/** Коллекция «Крутые карты»: [{ name, note, added }] */
+export function getCoolCards() {
+  try {
+    const list = JSON.parse(currentFiles().get(COOL_CARDS_FILE) || '[]');
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}

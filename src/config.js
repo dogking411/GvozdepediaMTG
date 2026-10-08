@@ -9,3 +9,4 @@ function detectRepo() {
 
 export const DEFAULT_REPO = detectRepo();
 export const DECKS_DIR = 'content/decks';
+export const COOL_CARDS_FILE = 'content/cards.json';

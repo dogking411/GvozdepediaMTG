@@ -8,6 +8,7 @@ const icon = (paths) =>
 const ICONS = {
   home: icon('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'),
   decks: icon('<rect x="7" y="3" width="13" height="17" rx="2"/><path d="M4 7v12a2 2 0 0 0 2 2h10"/>'),
+  cards: icon('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'),
   guides: icon('<path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a3 3 0 0 0-3 3"/><path d="M20 4v14h-7"/>'),
   news: icon('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/>'),
   tournaments: icon('<path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>'),
@@ -19,6 +20,7 @@ const ICONS = {
 const SECTIONS = [
   { id: 'home', href: '#/', label: 'Главная' },
   { id: 'decks', href: '#/decks', label: 'Колоды' },
+  { id: 'cards', href: '#/cards', label: 'Крутые карты' },
   { id: 'guides', href: '#/guides', label: 'Гайды', soon: true },
   { id: 'news', href: '#/news', label: 'Новости', soon: true },
   { id: 'tournaments', href: '#/tournaments', label: 'Турниры EDH', soon: true },

@@ -5,6 +5,7 @@ import { logout } from './lib/auth.js';
 import { deckPage } from './pages/deck.js';
 import { editDeckPage } from './pages/editDeck.js';
 import { homePage, decksPage, comingSoon, notFound } from './pages/misc.js';
+import { coolCardsPage } from './pages/coolCards.js';
 
 const app = document.querySelector('.app');
 const sidebar = document.getElementById('sidebar');
@@ -34,6 +35,7 @@ function route() {
   else if (section === 'decks' && slug && action === 'edit') editDeckPage(page, slug, isCurrent);
   else if (section === 'decks' && slug && !action) deckPage(page, slug, isCurrent);
   else if (section === 'decks' && !slug) decksPage(page, isCurrent);
+  else if (section === 'cards') coolCardsPage(page, isCurrent);
   else if (section === 'guides') comingSoon(page, 'Гайды');
   else if (section === 'news') comingSoon(page, 'Новости');
   else if (section === 'tournaments') comingSoon(page, 'Турниры EDH');

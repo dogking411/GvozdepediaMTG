@@ -2,8 +2,9 @@
 // с кэшем в localStorage, чтобы не дёргать API при каждом открытии страницы.
 
 const API = 'https://api.scryfall.com/cards/collection';
+const BASE = 'https://api.scryfall.com';
 const BATCH = 75; // лимит Scryfall на один запрос
-const CACHE_PREFIX = 'gvozd:card:v1:';
+const CACHE_PREFIX = 'gvozd:card:v2:';
 const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
 const memory = new Map();
@@ -46,6 +47,7 @@ function slim(card) {
     backImage: faces[1]?.image_uris?.normal || '',
     url: card.scryfall_uri,
     prices: card.prices?.usd || card.prices?.usd_foil || null,
+    text: card.oracle_text ?? faces.map((f) => f.oracle_text).filter(Boolean).join('\n\n'),
   };
 }
 
@@ -102,4 +104,36 @@ export function manaSymbols(cost) {
     const file = sym.replace(/\//g, '').toUpperCase();
     return `<img class="mana" src="https://svgs.scryfall.io/card-symbols/${file}.svg" alt="{${sym}}" title="{${sym}}" loading="lazy">`;
   });
+}
+
+// Кладёт карту из ответа Scryfall в кэш и возвращает компактную версию
+function remember(raw) {
+  const card = slim(raw);
+  memory.set(key(card.name), card);
+  writeCache(card);
+  return card;
+}
+
+/** Подсказки названий по мере ввода (как в строке поиска Scryfall). */
+export async function autocomplete(query, signal) {
+  if (query.trim().length < 2) return [];
+  const res = await fetch(`${BASE}/cards/autocomplete?q=${encodeURIComponent(query)}`, { signal });
+  if (!res.ok) return [];
+  return (await res.json()).data;
+}
+
+/** Точная карта по названию. */
+export async function namedCard(name) {
+  const res = await fetch(`${BASE}/cards/named?exact=${encodeURIComponent(name)}`);
+  if (!res.ok) throw new Error(`Карта «${name}» не найдена`);
+  return remember(await res.json());
+}
+
+/** Полный поиск с синтаксисом Scryfall: "t:artifact o:token", "c:r cmc<=2" и т.д. */
+export async function searchCards(query) {
+  const res = await fetch(`${BASE}/cards/search?q=${encodeURIComponent(query)}&unique=cards&order=name`);
+  if (res.status === 404) return { cards: [], total: 0 };
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.details || `Scryfall ответил ${res.status}`);
+  return { cards: json.data.map(remember), total: json.total_cards };
 }

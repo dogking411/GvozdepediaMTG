@@ -2,6 +2,7 @@ import { getDecks } from '../lib/content.js';
 import { isEditor } from '../lib/auth.js';
 import { fetchCards, lookup, manaSymbols } from '../lib/scryfall.js';
 import { esc } from '../lib/html.js';
+import { renderCoolStrip } from './coolCards.js';
 
 function deckTiles(el, isCurrent) {
   const decks = getDecks();
@@ -56,8 +57,13 @@ export function homePage(el, isCurrent) {
       <div class="section-head"><h2>Колоды</h2><a href="#/decks" class="muted">Все колоды →</a></div>
       <div class="deck-grid"></div>
     </section>
+    <section class="home-section">
+      <div class="section-head"><h2>Крутые карты</h2><a href="#/cards" class="muted">Все карты →</a></div>
+      <div class="cool-strip"></div>
+    </section>
   `;
   deckTiles(el, isCurrent);
+  renderCoolStrip(el.querySelector('.cool-strip'), isCurrent);
 }
 
 export function decksPage(el, isCurrent) {

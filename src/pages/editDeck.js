@@ -1,7 +1,7 @@
 import { getSession, isEditor } from '../lib/auth.js';
 import { getFile, putFile, deleteFile, explainError } from '../lib/github.js';
 import { parseDeckFile, parseDecklist, serializeDeck } from '../lib/deckFile.js';
-import { setPendingDeck } from '../lib/content.js';
+import { setPending } from '../lib/content.js';
 import { DECKS_DIR } from '../config.js';
 import { esc } from '../lib/html.js';
 import { openLoginDialog } from '../components/loginDialog.js';
@@ -187,7 +187,7 @@ export async function editDeckPage(el, slug, isCurrent) {
         `${isNew ? 'Новая колода' : 'Обновлена колода'}: ${f.deckName.value.trim()}`,
         sha,
       );
-      setPendingDeck(newSlug, text);
+      setPending(pathFor(newSlug), text);
       toast('Сохранено! Для остальных посетителей сайт обновится через 1–2 минуты.');
       location.hash = `#/decks/${newSlug}`;
     } catch (err) {
@@ -202,7 +202,7 @@ export async function editDeckPage(el, slug, isCurrent) {
     if (!confirm(`Удалить колоду «${deck.name}»? Её можно будет восстановить только через историю на GitHub.`)) return;
     try {
       await deleteFile(getSession(), pathFor(slug), `Удалена колода: ${deck.name}`, sha);
-      setPendingDeck(slug, null);
+      setPending(pathFor(slug), null);
       toast('Колода удалена.');
       location.hash = '#/decks';
     } catch (err) {
