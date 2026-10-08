@@ -1,6 +1,7 @@
 import { getDecks } from '../lib/content.js';
 import { getSession } from '../lib/auth.js';
 import { esc } from '../lib/html.js';
+import logoSvg from '../assets/logo.svg?raw';
 
 const icon = (paths) =>
   `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
@@ -53,7 +54,7 @@ export function renderSidebar(el, route) {
   el.innerHTML = `
     <div class="sidebar-head">
       <a class="logo" href="#/" title="GvozdepediaMTG">
-        <span class="logo-mark">G</span>
+        <span class="logo-mark">${logoSvg}</span>
         <span class="logo-text">Gvozdepedia<span>MTG</span></span>
       </a>
       <button class="collapse-btn" id="collapse-btn" aria-label="Свернуть меню">${ICONS.collapse}</button>

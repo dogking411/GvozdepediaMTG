@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GvozdepediaMTG">
+  <defs>
+    <linearGradient id="gvl-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6fdc8c"/>
+      <stop offset="1" stop-color="#2e9a52"/>
+    </linearGradient>
+    <linearGradient id="gvl-metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4f7f8"/>
+      <stop offset="1" stop-color="#b7c3c9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- значок-подложка -->
+  <rect x="2.5" y="2.5" width="59" height="59" rx="17" fill="url(#gvl-bg)" stroke="#123821" stroke-width="3"/>
+  <path d="M10 14c4-6 10-8.5 18-9" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- гвоздь -->
+  <g transform="rotate(-14 32 34)" stroke="#123821" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M24.5 19 H39.5 L37.5 45 L32 57 L26.5 45 Z" fill="url(#gvl-metal)"/>
+    <ellipse cx="32" cy="15.5" rx="14" ry="5" fill="url(#gvl-metal)"/>
+    <ellipse cx="27" cy="14.2" rx="4" ry="1.3" fill="#fff" stroke="none"/>
+
+    <!-- лицо -->
+    <circle cx="28.3" cy="28" r="3.3" fill="#fff" stroke-width="2"/>
+    <circle cx="35.7" cy="28" r="3.3" fill="#fff" stroke-width="2"/>
+    <circle cx="29" cy="28.6" r="1.5" fill="#123821" stroke="none"/>
+    <circle cx="36.4" cy="28.6" r="1.5" fill="#123821" stroke="none"/>
+    <ellipse cx="25.6" cy="33.6" rx="1.8" ry="1.1" fill="#ff8fa3" stroke="none"/>
+    <ellipse cx="38.4" cy="33.6" rx="1.8" ry="1.1" fill="#ff8fa3" stroke="none"/>
+    <path d="M29 34.2 Q32 37.6 35 34.2" fill="none" stroke-width="2"/>
+  </g>
+
+  <!-- искорка -->
+  <path d="M50 12 l1.6 3.6 3.6 1.6 -3.6 1.6 -1.6 3.6 -1.6 -3.6 -3.6 -1.6 3.6 -1.6z" fill="#fff" stroke="#123821" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>

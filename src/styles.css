@@ -1,16 +1,16 @@
 :root {
-  --bg: #f4efe6;
-  --surface: #fffcf6;
-  --surface-2: #f1eadd;
-  --border: #e1d6c4;
-  --text: #241d16;
-  --text-2: #4c4237;
-  --muted: #7a6d5f;
-  --accent: #9a5f0e;
-  --accent-soft: #f3e2c4;
-  --bar: #b07a2a;
+  --bg: #f2f4ef;
+  --surface: #fcfdfa;
+  --surface-2: #e9eee6;
+  --border: #d5ddd1;
+  --text: #17201a;
+  --text-2: #3b493f;
+  --muted: #66756b;
+  --accent: #2a7a45;
+  --accent-soft: #d9eedf;
+  --bar: #3d9a5d;
   --danger: #b3261e;
-  --shadow: 0 1px 2px rgb(60 40 10 / 0.06), 0 4px 16px rgb(60 40 10 / 0.06);
+  --shadow: 0 1px 2px rgb(20 50 30 / 0.06), 0 4px 16px rgb(20 50 30 / 0.07);
   --radius: 14px;
   --sidebar-w: 260px;
   --sidebar-w-collapsed: 72px;
@@ -26,16 +26,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #121016;
-    --surface: #1b1820;
-    --surface-2: #242029;
-    --border: #322c39;
-    --text: #eee8de;
-    --text-2: #cfc6ba;
-    --muted: #9c92a6;
-    --accent: #e0b25e;
-    --accent-soft: #3a2f1c;
-    --bar: #d6a650;
+    --bg: #0f1311;
+    --surface: #171c19;
+    --surface-2: #1f2622;
+    --border: #2b3530;
+    --text: #e7eee9;
+    --text-2: #c4cfc8;
+    --muted: #8d9b93;
+    --accent: #5fcf85;
+    --accent-soft: #1b3324;
+    --bar: #4db872;
     --danger: #ff8a80;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
     --pip-W: #f2ead0;
@@ -45,16 +45,16 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #121016;
-  --surface: #1b1820;
-  --surface-2: #242029;
-  --border: #322c39;
-  --text: #eee8de;
-  --text-2: #cfc6ba;
-  --muted: #9c92a6;
-  --accent: #e0b25e;
-  --accent-soft: #3a2f1c;
-  --bar: #d6a650;
+  --bg: #0f1311;
+  --surface: #171c19;
+  --surface-2: #1f2622;
+  --border: #2b3530;
+  --text: #e7eee9;
+  --text-2: #c4cfc8;
+  --muted: #8d9b93;
+  --accent: #5fcf85;
+  --accent-soft: #1b3324;
+  --bar: #4db872;
   --danger: #ff8a80;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
   --pip-W: #f2ead0;
@@ -151,12 +151,18 @@ code { background: var(--surface-2); padding: 1px 6px; border-radius: 6px; font-
   flex: none;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #6b3d08);
-  color: #fff8ea;
-  font: 700 1.3rem Cinzel, serif;
+  width: 44px;
+  height: 44px;
+}
+.logo-mark svg { width: 100%; height: 100%; display: block; }
+.logo:hover .logo-mark { animation: wiggle 0.5s ease-in-out; }
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg) scale(1.06); }
+  60% { transform: rotate(7deg) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo:hover .logo-mark { animation: none; }
 }
 .logo-text { font: 700 1rem Cinzel, serif; white-space: nowrap; }
 .logo-text span, .hero-title span { color: var(--accent); }
