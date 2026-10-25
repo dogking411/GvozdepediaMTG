@@ -40,7 +40,6 @@ T&T — это четырёхцветный мидрейндж, который �
 1 Commandeer (OTP) 9
 1 Copy Enchantment (WOT) 16
 1 Crop Rotation (SLC) 3
-1 Cyclonic Rift (2XM) 339
 1 Dark Ritual (STA) 26
 1 Deadly Rollick (CMM) 147
 1 Deathrite Shaman (SLC) 2012
@@ -108,6 +107,7 @@ T&T — это четырёхцветный мидрейндж, который �
 1 Sol Ring (SLD) 1696
 1 Starting Town (FIN) 289
 1 Subtlety (MH2) 67
+1 Survival of the Fittest (EXO) 129
 1 Swan Song (SLD) 1591
 1 Swords to Plowshares (SPG) 54
 1 Tarnished Citadel (ODY) 329
@@ -127,12 +127,13 @@ T&T — это четырёхцветный мидрейндж, который �
 
 1 Beholder's Death Ray (SLD) 1792
 1 Culling Ritual (SOA) 62
+1 Cyclonic Rift (2XM) 339
 1 Delney, Streetwise Lookout (MKM) 337
 1 Into the Flood Maw (BLB) 52
 1 Mnemonic Betrayal (GRN) 189
 1 Noxious Revival (SPG) 73
 1 Opposition Agent (MAR) 19
 1 Permission Denied (REX) 17
+1 Praetor's Grasp (SLD) 1023
 1 Strix Serenade (MH3) 327
 1 Veil of Summer (SOA) 60
-1 Praetor's Grasp (SLD) 1023
