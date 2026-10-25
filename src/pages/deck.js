@@ -49,15 +49,15 @@ export function deckPage(el, slug, isCurrent) {
               ${deck.moxfield ? `<a class="btn btn-primary" href="${esc(deck.moxfield)}" target="_blank" rel="noopener">Открыть на Moxfield ↗</a>` : ''}
               <button class="btn" id="copy-list">Скопировать список</button>
               ${isEditor() ? `<a class="btn" href="#/decks/${deck.slug}/edit">✎ Редактировать</a>
-                <button class="btn" id="sync-btn" title="Обновить деклист и Sideboard из Moxfield">⟳ Синхронизировать</button>` : ''}
+                <button class="btn" id="sync-btn" title="Обновить Mainboard и Sideboard из Moxfield">⟳ Синхронизировать</button>` : ''}
             </div>
           </div>
         </header>
 
         <section class="panel decklist-panel">
           <div class="panel-head">
-            <h2>Деклист</h2>
-            <div class="segmented" role="group" aria-label="Вид деклиста">
+            <h2>Decklist</h2>
+            <div class="segmented" role="group" aria-label="Вид Decklist">
               <button data-view="list">Списком</button>
               <button data-view="grid">Картинками</button>
             </div>

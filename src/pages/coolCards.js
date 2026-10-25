@@ -10,11 +10,12 @@ import { mountArtPicker } from '../components/artPicker.js';
 import { toast } from '../components/toast.js';
 
 const COLORS = ['W', 'U', 'B', 'R', 'G', 'C'];
+const COLOR_NAMES = { W: 'White', U: 'Blue', B: 'Black', R: 'Red', G: 'Green', C: 'Colorless' };
 
 const SORTS = {
   added: { label: 'Сначала новые', fn: (a, b) => (b.entry.added || '').localeCompare(a.entry.added || '') || b.i - a.i },
   name: { label: 'По названию', fn: (a, b) => a.entry.name.localeCompare(b.entry.name) },
-  cmc: { label: 'По мана-стоимости', fn: (a, b) => (a.card?.cmc ?? 0) - (b.card?.cmc ?? 0) },
+  cmc: { label: 'По mana value', fn: (a, b) => (a.card?.cmc ?? 0) - (b.card?.cmc ?? 0) },
 };
 
 // Запись коллекции: { name, id?, flavor?, note, added }. id — выбранная печать (арт).
@@ -49,7 +50,7 @@ export function coolCardsPage(el, isCurrent) {
     <div class="toolbar">
       <input class="filter-input" type="search" placeholder="Фильтр по названию или заметке" aria-label="Фильтр">
       <div class="color-filter" role="group" aria-label="Фильтр по цвету">
-        ${COLORS.map((c) => `<button type="button" data-color="${c}" aria-pressed="false" title="${c === 'C' ? 'Бесцветные' : c}">${manaSymbols(`{${c}}`)}</button>`).join('')}
+        ${COLORS.map((c) => `<button type="button" data-color="${c}" aria-pressed="false" title="${COLOR_NAMES[c]}">${manaSymbols(`{${c}}`)}</button>`).join('')}
       </div>
       <select class="sort-select" aria-label="Сортировка">
         ${Object.entries(SORTS).map(([k, s]) => `<option value="${k}">${s.label}</option>`).join('')}

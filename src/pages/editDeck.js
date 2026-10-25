@@ -109,7 +109,7 @@ export async function editDeckPage(el, slug, isCurrent) {
         </section>
 
         <section class="panel">
-          <h2>Деклист <span class="muted" id="card-count"></span></h2>
+          <h2>Decklist <span class="muted" id="card-count"></span></h2>
           <label class="field">
             <span>Вставь экспорт из Moxfield: «1 Sol Ring» — по карте в строке</span>
             <textarea name="decklist" class="mono" rows="30" spellcheck="false">${esc(deck.decklistText)}</textarea>

@@ -3,11 +3,11 @@ import { manaSymbols } from '../lib/scryfall.js';
 import { groupByType } from './decklist.js';
 
 const COLORS = [
-  { key: 'W', label: 'Белый' },
-  { key: 'U', label: 'Синий' },
-  { key: 'B', label: 'Чёрный' },
-  { key: 'R', label: 'Красный' },
-  { key: 'G', label: 'Зелёный' },
+  { key: 'W', label: 'White' },
+  { key: 'U', label: 'Blue' },
+  { key: 'B', label: 'Black' },
+  { key: 'R', label: 'Red' },
+  { key: 'G', label: 'Green' },
 ];
 
 export function computeStats(entries, commanderCards) {
@@ -54,17 +54,17 @@ export function renderStats(s) {
   return `
     <div class="kpis">
       <div class="kpi"><span class="kpi-value">${s.total}</span><span class="kpi-label">карт</span></div>
-      <div class="kpi"><span class="kpi-value">${s.lands}</span><span class="kpi-label">земель</span></div>
-      <div class="kpi"><span class="kpi-value">${s.avgCmc.toFixed(2)}</span><span class="kpi-label">ср. мана-стоимость</span></div>
+      <div class="kpi"><span class="kpi-value">${s.lands}</span><span class="kpi-label">lands</span></div>
+      <div class="kpi"><span class="kpi-value">${s.avgCmc.toFixed(2)}</span><span class="kpi-label">avg. mana value</span></div>
       ${s.price ? `<div class="kpi"><span class="kpi-value">$${Math.round(s.price)}</span><span class="kpi-label">цена (Scryfall)</span></div>` : ''}
     </div>
 
-    <h4>Мана-кривая <span class="muted">без земель</span></h4>
-    <div class="curve" role="img" aria-label="Мана-кривая: ${s.curve.map((n, i) => `${i === 7 ? '7+' : i} — ${n}`).join(', ')}">
+    <h4>Mana curve <span class="muted">без Lands</span></h4>
+    <div class="curve" role="img" aria-label="Mana curve: ${s.curve.map((n, i) => `${i === 7 ? '7+' : i} — ${n}`).join(', ')}">
       ${s.curve
         .map(
           (n, i) => `
-          <div class="curve-col" data-tip="${i === 7 ? '7+' : i} маны: ${n} карт">
+          <div class="curve-col" data-tip="MV ${i === 7 ? '7+' : i}: ${n} карт">
             <span class="curve-value">${n || ''}</span>
             <div class="curve-bar" style="height:${(n / curveMax) * 100}%"></div>
             <span class="curve-label">${i === 7 ? '7+' : i}</span>
@@ -73,7 +73,7 @@ export function renderStats(s) {
         .join('')}
     </div>
 
-    <h4>Типы карт</h4>
+    <h4>Card types</h4>
     <div class="hbars">
       ${s.types
         .map(
@@ -89,7 +89,7 @@ export function renderStats(s) {
 
     ${
       pipTotal
-        ? `<h4>Цветные символы маны</h4>
+        ? `<h4>Color pips</h4>
     <div class="hbars">
       ${COLORS.filter((c) => s.pips[c.key])
         .map(
