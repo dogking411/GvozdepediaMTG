@@ -45,7 +45,6 @@ moxfield: https://moxfield.com/decks/dPQeXTu6s06OVMcwt178fQ
 1 Defend the Rider (DFT) 157
 1 Delighted Halfling (LTR) 402
 1 Disruptor Flute (MH3) 209
-1 Ecological Appreciation (PSTX) 128p
 1 Eldritch Evolution (SLP) 5
 1 Elvish Mystic (CMM) 648
 1 Elvish Spirit Guide (SLD) 423
@@ -77,12 +76,12 @@ moxfield: https://moxfield.com/decks/dPQeXTu6s06OVMcwt178fQ
 1 Liberator, Urza's Battlethopter (SLD) 2286
 1 Lithoform Engine (BRC) 146
 1 Llanowar Elves (SLC) 12
-1 Lotus Petal (MPS) 15 *F*
+1 Lotus Petal (MPS) 15
 1 Mana Vault (2X2) 394
 1 Marwyn, the Preserver (FRA) 263
 1 Mindslaver (OTP) 63
 1 Mirage Mirror (SLD) 2030
-1 Mox Diamond (V10) 10 *F*
+1 Mox Diamond (V10) 10
 1 Nature's Rhythm (TDM) 349
 1 Noxious Revival (SPG) 73
 1 Peerless Recycling (BLB) 188
@@ -109,6 +108,7 @@ moxfield: https://moxfield.com/decks/dPQeXTu6s06OVMcwt178fQ
 1 Tezzeret, Cruel Captain (EOE) 287
 1 The Mycosynth Gardens (ONE) 256
 1 The Underworld Cookbook (MH2) 434
+1 The Wiseman, Eccentric Oracle (SLD) 2843
 1 Time of Need (TSR) 369
 1 Urza's Saga (SLC) 21
 1 Veil of Summer (SOA) 60
@@ -122,11 +122,14 @@ moxfield: https://moxfield.com/decks/dPQeXTu6s06OVMcwt178fQ
 
 1 Buried Ruin (PIP) 254
 1 Damping Sphere (DOM) 213
+1 Ecological Appreciation (PSTX) 128p
 1 Expedition Map (SLD) 7053
 1 Haywire Mite (SOC) 349
 1 Heartwood Storyteller (PLST) FUT-127
 1 Moonsilver Key (MID) 255
 1 Nature's Claim (WWK) 108
+1 Phyrexian Revoker (M15) 225
+1 Pithing Needle (MID) 257
 1 Scroll of Fate (MKC) 235
 1 Soulless Jailer (ONE) 397
 1 Torpor Orb (BIG) 57
