@@ -1,6 +1,6 @@
 ---
 name: Trickle-Down Tokenomics
-commander: Clan Crafter | Jaheira, Friend of the Forest
+commander: Jaheira, Friend of the Forest | Clan Crafter
 moxfield: https://moxfield.com/decks/40O01S5oX0CGCB1tGgFvvw
 ---
 
