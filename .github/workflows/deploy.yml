@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call: # из sync-moxfield.yml после синхронизации колоды
 
 permissions:
   contents: read
@@ -20,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # свежая голова ветки: при вызове из синхронизации нужен только что сделанный коммит
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22

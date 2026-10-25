@@ -31,6 +31,22 @@ export function parseExport(text) {
 
 const byName = (list) => new Map(list.map((c) => [c.name.toLowerCase(), c]));
 
+/** Разница основной колоды: что добавлено, убрано и где поменялось количество. */
+export function diffMain(oldText, oldCommanders, newText, newCommanders) {
+  const oldMain = byName(parseDecklist(oldText, oldCommanders));
+  const newMain = byName(parseDecklist(newText, newCommanders));
+  const added = [];
+  const removed = [];
+  const changed = [];
+  for (const [k, c] of newMain) {
+    const old = oldMain.get(k);
+    if (!old) added.push(c);
+    else if (old.qty !== c.qty) changed.push({ ...c, from: old.qty });
+  }
+  for (const [k, c] of oldMain) if (!newMain.has(k)) removed.push(c);
+  return { added, removed, changed, newMain };
+}
+
 /**
  * Сравнивает текущую колоду с экспортом и готовит новые тексты разделов.
  * Заметки к картам Sideboard сохраняются; если в экспорте нет Sideboard — он не трогается.
@@ -41,18 +57,7 @@ export function planSync(deck, exportText) {
   const commanders = exportCommanders.length ? exportCommanders : deck.commanders;
 
   const decklistText = [...exp.commander, ...exp.main].join('\n');
-  const oldMain = byName(parseDecklist(deck.decklistText, deck.commanders));
-  const newMain = byName(parseDecklist(decklistText, commanders));
-
-  const added = [];
-  const removed = [];
-  const changed = [];
-  for (const [k, c] of newMain) {
-    const old = oldMain.get(k);
-    if (!old) added.push(c);
-    else if (old.qty !== c.qty) changed.push({ ...c, from: old.qty });
-  }
-  for (const [k, c] of oldMain) if (!newMain.has(k)) removed.push(c);
+  const { added, removed, changed, newMain } = diffMain(deck.decklistText, deck.commanders, decklistText, commanders);
 
   let sideboardText = deck.sideboardText;
   if (exp.hasSide) {

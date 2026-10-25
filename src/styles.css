@@ -808,3 +808,27 @@ button.card-tile:hover { outline: 2px solid var(--accent); }
 .sync-list { margin: 0; padding-left: 1.2em; font-size: 0.88rem; columns: 2; }
 .sync-add { color: var(--accent); }
 .sync-remove { color: var(--danger); }
+
+/* ---------- Шаги автоматической синхронизации ---------- */
+
+.progress-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.progress-steps li { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.progress-steps li::before {
+  content: '';
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+}
+.progress-steps li.active { color: var(--text); }
+.progress-steps li.active::before { border-color: var(--accent); border-top-color: transparent; animation: spin 0.8s linear infinite; }
+.progress-steps li.done { color: var(--text-2); }
+.progress-steps li.done::before { content: '✓'; display: grid; place-items: center; font-size: 0.7rem; background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.progress-steps li.failed { color: var(--danger); }
+.progress-steps li.failed::before { content: '!'; display: grid; place-items: center; font-size: 0.7rem; font-weight: 700; border-color: var(--danger); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .progress-steps li.active::before { animation: none; } }
+.sync-result:empty { display: none; }
+.sync-result p { margin: 0 0 6px; }
+.sync-result h4 { margin: 10px 0 4px; font-size: 1rem; }
