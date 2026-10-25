@@ -1,5 +1,5 @@
 ---
-name: Insomnia
+name: Pleonexia
 commander: Cecil Harvey | Tidus, Zanarkand Fayth
 moxfield: https://moxfield.com/decks/mvx7a9LTqUCtXsNKQ05Aww
 ---
