@@ -13,6 +13,7 @@ const ICONS = {
   guides: icon('<path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a3 3 0 0 0-3 3"/><path d="M20 4v14h-7"/>'),
   news: icon('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/>'),
   tournaments: icon('<path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>'),
+  apps: icon('<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>'),
   collapse: icon('<path d="M15 6l-6 6 6 6"/>'),
   login: icon('<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5M15 12H3"/>'),
   logout: icon('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>'),
@@ -25,6 +26,7 @@ const SECTIONS = [
   { id: 'guides', href: '#/guides', label: 'Гайды', soon: true },
   { id: 'news', href: '#/news', label: 'Новости', soon: true },
   { id: 'tournaments', href: '#/tournaments', label: 'Турниры EDH', soon: true },
+  { id: 'apps', href: 'apps/', label: 'Little Apps' }, // отдельный сайт с калькуляторами
 ];
 
 function account() {

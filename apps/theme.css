@@ -1,0 +1,70 @@
+/* Палитра Little Apps — та же, что у Gvozdepedia. Тему можно закрепить через data-theme на <html>. */
+:root {
+  --bg: #f2f4ef;
+  --surface: #fcfdfa;
+  --surface-2: #e9eee6;
+  --border: #d5ddd1;
+  --text: #17201a;
+  --text-2: #3b493f;
+  --muted: #66756b;
+  --accent: #2a7a45;
+  --accent-soft: #d9eedf;
+  --shadow: 0 1px 2px rgb(20 50 30 / 0.06), 0 4px 16px rgb(20 50 30 / 0.07);
+  --radius: 14px;
+
+  --food: #2f8f53;
+  --treasure: #b7800f;
+  --clue: #3a76b8;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f1311;
+    --surface: #171c19;
+    --surface-2: #1f2622;
+    --border: #2b3530;
+    --text: #e7eee9;
+    --text-2: #c4cfc8;
+    --muted: #8d9b93;
+    --accent: #5fcf85;
+    --accent-soft: #1b3324;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
+    --food: #5fcf85;
+    --treasure: #e8b53e;
+    --clue: #6aa8ec;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f1311;
+  --surface: #171c19;
+  --surface-2: #1f2622;
+  --border: #2b3530;
+  --text: #e7eee9;
+  --text-2: #c4cfc8;
+  --muted: #8d9b93;
+  --accent: #5fcf85;
+  --accent-soft: #1b3324;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
+  --food: #5fcf85;
+  --treasure: #e8b53e;
+  --clue: #6aa8ec;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CabbageFarm" />
+    <title>CabbageFarm</title>
+    <link rel="icon" type="image/svg+xml" href="../../src/assets/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../theme.css" />
+    <link rel="stylesheet" href="./style.css" />
+    <script>
+      // Тема до первой отрисовки, чтобы не мигало
+      try {
+        const t = localStorage.getItem('gvozd:apps-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="bar-group">
+          <a class="tb-btn" id="home" href="../" title="Little Apps" aria-label="Все приложения"></a>
+          <span class="title">CabbageFarm</span>
+        </div>
+
+        <div class="bar-group effects" aria-label="Эффекты на столе">
+          <div class="stepper" id="mfg" title="Сколько Academy Manufactor под вашим контролем">
+            <button class="step" id="mfg-minus" aria-label="Убрать одного Manufactor"></button>
+            <span class="step-value"><span class="step-icon" id="mfg-icon"></span><span class="step-label">Manufactor</span><b id="mfg-count">0</b></span>
+            <button class="step" id="mfg-plus" aria-label="Добавить Manufactor"></button>
+          </div>
+          <button class="chip" id="peregrin" aria-pressed="false" title="Peregrin Took: каждое создание токенов даёт ещё одну Еду">Peregrin</button>
+          <button class="chip" id="bilbo" aria-pressed="false" title="Bilbo, Fellow Conspirator: каждая Еда приносит ещё и Сокровище">Bilbo</button>
+          <span class="yield" id="yield" hidden></span>
+        </div>
+
+        <div class="bar-group tools">
+          <button class="tb-btn" id="untap" title="Развернуть все" aria-label="Развернуть все"></button>
+          <button class="tb-btn" id="reset" title="Убрать все токены" aria-label="Убрать все токены"></button>
+          <button class="tb-btn" id="wake" aria-pressed="false" hidden></button>
+          <button class="tb-btn" id="theme"></button>
+          <button class="tb-btn" id="help-btn" title="Как пользоваться" aria-label="Как пользоваться"></button>
+        </div>
+      </header>
+
+      <main class="panels" id="panels"></main>
+    </div>
+
+    <dialog class="sheet" id="help">
+      <h2>Как пользоваться</h2>
+      <ul>
+        <li><span class="sheet-icon" data-icon="plus"></span><span><b>Верхняя левая</b> часть панели добавляет токен. Удерживайте, чтобы добавлять подряд.</span></li>
+        <li><span class="sheet-icon" data-icon="tap"></span><span><b>Верхняя правая</b> тапает один токен.</span></li>
+        <li><span class="sheet-icon" data-icon="minus"></span><span><b>Нижняя</b> часть убирает токен: сначала тапнутые, потом остальные.</span></li>
+        <li><span class="sheet-icon" data-icon="untap"></span><span><b>Развернуть все</b> на верхней панели снимает тап со всех токенов.</span></li>
+        <li><span class="sheet-icon" data-icon="gear"></span><span><b>Academy Manufactor</b>: укажите, сколько их у вас. Каждое создание токена превращается в 3<sup>n−1</sup> токенов <em>каждого</em> вида: 1 при одном, 3 при двух, 9 при трёх.</span></li>
+        <li><span class="sheet-icon sheet-letter">P</span><span><b>Peregrin Took</b>: включите, пока он на столе, — каждое добавление даёт ещё и Еду. С Manufactor эта Еда тоже размножается: 2 каждого при одном, 6 при двух.</span></li>
+        <li><span class="sheet-icon sheet-letter">B</span><span><b>Bilbo</b>: включите, пока он на столе, — каждая созданная Еда приносит Сокровище. Эффекты применяются в том порядке, который даёт больше всего токенов.</span></li>
+      </ul>
+      <form method="dialog"><button class="sheet-close">Понятно</button></form>
+    </dialog>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
