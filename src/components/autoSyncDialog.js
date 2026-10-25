@@ -46,9 +46,21 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
       <div class="sync-result"></div>
       <details class="hint bookmarklet-hint">
         <summary>Компьютер выключен? Есть закладка для Moxfield</summary>
-        <p>Перетащи эту кнопку на панель закладок браузера:</p>
-        <p><a class="btn bookmarklet" href="${bookmarkletHref()}" title="Перетащи на панель закладок">→ Gvozdepedia</a></p>
-        <p>Потом открой свою колоду на Moxfield и нажми закладку — сайт откроется с готовым списком изменений.</p>
+        <p><b>На компьютере:</b> перетащи эту кнопку на панель закладок браузера.</p>
+        <p class="bookmarklet-actions">
+          <a class="btn bookmarklet" href="${bookmarkletHref()}" title="Перетащи на панель закладок">→ Gvozdepedia</a>
+          <button type="button" class="btn" data-act="copy-bookmarklet">📋 Скопировать для телефона</button>
+        </p>
+        <p><b>На телефоне</b> перетаскивать нельзя — закладку создают вручную:</p>
+        <ol>
+          <li>Нажми «Скопировать для телефона».</li>
+          <li>Добавь в закладки любую страницу (например, эту), назови закладку <b>gvozd</b>.</li>
+          <li>Отредактируй эту закладку и вставь скопированное в поле <b>адреса (URL)</b> вместо ссылки.</li>
+          <li>Открой свою колоду на Moxfield. <b>Chrome (Android):</b> набери <b>gvozd</b> в адресной строке и нажми
+            на закладку в подсказках. <b>Safari (iPhone):</b> открой закладки и нажми на неё.</li>
+        </ol>
+        <p>Сайт откроется с готовым списком изменений — останется нажать «Обновить колоду».
+          Firefox на Android такие закладки не запускает — там удобнее «Вставить вручную».</p>
       </details>
       <div class="form-actions">
         <button type="button" class="btn" data-act="manual" hidden>Вставить вручную</button>
@@ -79,6 +91,14 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
   dialog.querySelector('.bookmarklet').addEventListener('click', (e) => {
     e.preventDefault();
     alert('Перетащи кнопку на панель закладок, а нажимай её на странице колоды на Moxfield.');
+  });
+  dialog.querySelector('[data-act="copy-bookmarklet"]').addEventListener('click', async (e) => {
+    try {
+      await navigator.clipboard.writeText(bookmarkletHref());
+      e.target.textContent = 'Скопировано ✓';
+    } catch {
+      e.target.textContent = 'Не удалось скопировать';
+    }
   });
   manual.addEventListener('click', () => {
     dialog.close();

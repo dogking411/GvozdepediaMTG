@@ -835,3 +835,6 @@ button.card-tile:hover { outline: 2px solid var(--accent); }
 
 .bookmarklet-hint p { margin: 6px 0; }
 .bookmarklet { cursor: grab; border-style: dashed; border-color: var(--accent); color: var(--accent); }
+.bookmarklet-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.bookmarklet-hint ol { padding-left: 1.2em; margin: 6px 0; }
+.bookmarklet-hint li { margin-bottom: 4px; }
