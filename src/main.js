@@ -59,4 +59,5 @@ document.getElementById('sidebar-backdrop').addEventListener('click', () => app.
 initCardPreview(document.getElementById('card-preview'));
 window.addEventListener('hashchange', route);
 window.addEventListener('gvozd:auth', route); // вошёл/вышел — перерисовать кнопки редактора
+window.addEventListener('gvozd:content', route); // сохранили изменения — показать их
 route();

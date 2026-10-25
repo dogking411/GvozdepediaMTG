@@ -63,3 +63,23 @@ export function renderDecklist(entries, view = 'list') {
     )
     .join('')}</div>`;
 }
+
+// Sideboard: компактный список с заметками, по типам и мана-стоимости
+export function renderSideboard(entries) {
+  const groups = groupByType(entries);
+  return `<ul class="sideboard-list">${groups
+    .flatMap((g) => g.items.map((e) => ({ ...e, group: g.label })))
+    .map(
+      (e) => `
+      <li class="card-row sb-row" ${imgAttrs(e.card)}>
+        <span class="qty">${e.qty}</span>
+        <span class="card-name">
+          ${e.card?.url ? `<a href="${esc(e.card.url)}" target="_blank" rel="noopener">${esc(e.name)}</a>` : esc(e.name)}
+          <small class="muted"> · ${e.group}</small>
+          ${e.note ? `<span class="sb-note">${esc(e.note)}</span>` : ''}
+        </span>
+        <span class="cost">${manaSymbols(e.card?.manaCost)}</span>
+      </li>`,
+    )
+    .join('')}</ul>`;
+}

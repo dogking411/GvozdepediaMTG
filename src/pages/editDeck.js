@@ -39,7 +39,7 @@ export async function editDeckPage(el, slug, isCurrent) {
     return;
   }
 
-  let deck = { name: '', commanders: [], moxfield: '', primer: '', thoughts: '', decklistText: '' };
+  let deck = { name: '', commanders: [], moxfield: '', primer: '', thoughts: '', decklistText: '', sideboardText: '' };
   let sha;
 
   if (!isNew) {
@@ -114,6 +114,10 @@ export async function editDeckPage(el, slug, isCurrent) {
             <span>Вставь экспорт из Moxfield: «1 Sol Ring» — по карте в строке</span>
             <textarea name="decklist" class="mono" rows="30" spellcheck="false">${esc(deck.decklistText)}</textarea>
           </label>
+          <label class="field">
+            <span>Sideboard <small class="muted">карты, о которых думаю и которые тестирую; заметка — после #</small></span>
+            <textarea name="sideboard" class="mono" rows="6" spellcheck="false" placeholder="1 Damping Sphere # тестирую вместо Trinisphere">${esc(deck.sideboardText)}</textarea>
+          </label>
         </section>
       </div>
 
@@ -171,6 +175,7 @@ export async function editDeckPage(el, slug, isCurrent) {
       primer: f.primer.value,
       thoughts: f.thoughts.value,
       decklistText: f.decklist.value,
+      sideboardText: f.sideboard.value,
     });
 
     saveBtn.disabled = true;

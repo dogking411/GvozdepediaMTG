@@ -1,9 +1,14 @@
 import { marked } from 'marked';
-import { findDeck } from '../lib/content.js';
-import { isEditor } from '../lib/auth.js';
+import { findDeck, setPending } from '../lib/content.js';
+import { isEditor, getSession } from '../lib/auth.js';
+import { getFile, putFile, explainError } from '../lib/github.js';
+import { parseDeckFile, serializeDeck } from '../lib/deckFile.js';
+import { DECKS_DIR } from '../config.js';
 import { fetchCards, lookup, manaSymbols, requestFor } from '../lib/scryfall.js';
 import { esc } from '../lib/html.js';
-import { renderDecklist } from '../components/decklist.js';
+import { renderDecklist, renderSideboard } from '../components/decklist.js';
+import { openSyncDialog } from '../components/syncDialog.js';
+import { toast } from '../components/toast.js';
 import { computeStats, renderStats } from '../components/stats.js';
 import { notFound } from './misc.js';
 
@@ -43,7 +48,8 @@ export function deckPage(el, slug, isCurrent) {
             <div class="deck-actions">
               ${deck.moxfield ? `<a class="btn btn-primary" href="${esc(deck.moxfield)}" target="_blank" rel="noopener">Открыть на Moxfield ↗</a>` : ''}
               <button class="btn" id="copy-list">Скопировать список</button>
-              ${isEditor() ? `<a class="btn" href="#/decks/${deck.slug}/edit">✎ Редактировать</a>` : ''}
+              ${isEditor() ? `<a class="btn" href="#/decks/${deck.slug}/edit">✎ Редактировать</a>
+                <button class="btn" id="sync-btn" title="Обновить деклист и Sideboard из Moxfield">⟳ Синхронизировать</button>` : ''}
             </div>
           </div>
         </header>
@@ -58,6 +64,18 @@ export function deckPage(el, slug, isCurrent) {
           </div>
           <div id="decklist"><p class="muted loading">Загружаю карты со Scryfall…</p></div>
         </section>
+
+        ${
+          deck.sideboard.length
+            ? `<details class="panel sideboard-panel">
+                <summary>
+                  <h2>Sideboard <span class="muted">${deck.sideboard.reduce((s, c) => s + c.qty, 0)}</span></h2>
+                  <span class="muted">карты, о которых думаю и которые тестирую</span>
+                </summary>
+                <div id="sideboard"><p class="muted loading">Загружаю…</p></div>
+              </details>`
+            : ''
+        }
       </div>
 
       <aside class="deck-side">
@@ -84,13 +102,36 @@ export function deckPage(el, slug, isCurrent) {
     setTimeout(() => (e.target.textContent = 'Скопировать список'), 2000);
   });
 
+  el.querySelector('#sync-btn')?.addEventListener('click', () =>
+    openSyncDialog({ deck, onApply: (plan) => applySync(deck, plan) }),
+  );
+
   load(el, deck, isCurrent);
+}
+
+// Сохраняет результат синхронизации: берём свежий файл с GitHub и меняем только состав
+async function applySync(deck, plan) {
+  const session = getSession();
+  const path = `${DECKS_DIR}/${deck.slug}.md`;
+  let text;
+  try {
+    const file = await getFile(session, path);
+    if (!file) throw new Error('Файл колоды не найден в репозитории.');
+    const current = parseDeckFile(file.text, deck.slug);
+    text = serializeDeck({ ...current, commanders: plan.commanders, decklistText: plan.decklistText, sideboardText: plan.sideboardText });
+    await putFile(session, path, text, `Синхронизация с Moxfield: ${current.name}`, file.sha);
+  } catch (err) {
+    throw new Error(err.status ? explainError(err) : err.message);
+  }
+  setPending(path, text);
+  toast('Колода обновлена! Для остальных посетителей — через 1–2 минуты.');
+  window.dispatchEvent(new Event('gvozd:content'));
 }
 
 async function load(el, deck, isCurrent) {
   let map;
   try {
-    map = await fetchCards([...deck.commanderEntries, ...deck.cards].map(requestFor));
+    map = await fetchCards([...deck.commanderEntries, ...deck.cards, ...deck.sideboard].map(requestFor));
   } catch (err) {
     if (!isCurrent()) return;
     el.querySelector('#decklist').innerHTML = `<p class="error">Не удалось загрузить карты: ${esc(err.message)}</p>`;
@@ -131,4 +172,9 @@ async function load(el, deck, isCurrent) {
   show(getView());
 
   el.querySelector('#stats').innerHTML = renderStats(computeStats(entries, commanderCards));
+
+  const sideboardEl = el.querySelector('#sideboard');
+  if (sideboardEl) {
+    sideboardEl.innerHTML = renderSideboard(deck.sideboard.map((c) => ({ ...c, card: lookup(map, requestFor(c)) })));
+  }
 }
