@@ -1,5 +1,7 @@
-// Синхронизация колоды с Moxfield. Запускается в GitHub Actions (.github/workflows/sync-moxfield.yml):
-//   node scripts/sync-moxfield.mjs <slug>
+// Синхронизация колоды с Moxfield. Запускается в GitHub Actions (.github/workflows/sync-moxfield.yml)
+// на компьютере редактора (self-hosted runner) — с серверов GitHub Moxfield запросы не пускает:
+//   node scripts/sync-moxfield.mjs <slug> [--commit]      (slug можно передать и через переменную SLUG)
+// --commit — закоммитить и запушить изменения, записать changed=true/false в GITHUB_OUTPUT.
 // Забирает Mainboard, Sideboard и командира по ссылке moxfield из content/decks/<slug>.md
 // и перезаписывает только состав колоды — праймер, мысли и заметки к Sideboard сохраняются.
 
@@ -7,7 +9,9 @@ import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { parseDeckFile, parseDecklist, parseDecklistLines, serializeDeck } from '../src/lib/deckFile.js';
 
-const slug = process.argv[2] || '';
+const args = process.argv.slice(2);
+const slug = args.find((a) => !a.startsWith('--')) || process.env.SLUG || '';
+const shouldCommit = args.includes('--commit');
 if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) fail(`Некорректный адрес колоды: "${slug}"`);
 
 const path = `content/decks/${slug}.md`;
@@ -89,6 +93,18 @@ console.log(report);
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report + '\n');
 
 writeFileSync(path, text);
+
+if (shouldCommit) {
+  const changed = text.trim() !== raw.trim();
+  if (changed) {
+    const git = (...a) => execFileSync('git', a, { stdio: 'inherit' });
+    git('config', 'user.name', 'github-actions[bot]');
+    git('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com');
+    git('commit', '-am', `Синхронизация с Moxfield: ${deck.name}`);
+    git('push');
+  }
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `changed=${changed}\n`);
+}
 
 function fail(message) {
   console.error(`::error::${message}`);

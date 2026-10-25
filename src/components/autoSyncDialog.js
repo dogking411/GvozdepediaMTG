@@ -4,14 +4,17 @@ import { parseDeckFile } from '../lib/deckFile.js';
 import { diffMain } from '../lib/moxfieldExport.js';
 import { DECKS_DIR } from '../config.js';
 import { esc } from '../lib/html.js';
+import { bookmarkletHref } from '../lib/bookmarklet.js';
 
 const WORKFLOW = 'sync-moxfield.yml';
 const POLL_MS = 3000;
 const TIMEOUT_MS = 5 * 60 * 1000;
 
+const QUEUED_HINT_MS = 20 * 1000;
+
 const STEPS = [
   ['start', 'Запускаю синхронизацию на GitHub'],
-  ['fetch', 'Забираю колоду с Moxfield'],
+  ['fetch', 'Твой компьютер забирает колоду с Moxfield'],
   ['save', 'Сохраняю изменения'],
 ];
 
@@ -41,6 +44,12 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
         ${STEPS.map(([id, label]) => `<li data-step="${id}">${label}</li>`).join('')}
       </ol>
       <div class="sync-result"></div>
+      <details class="hint bookmarklet-hint">
+        <summary>Компьютер выключен? Есть закладка для Moxfield</summary>
+        <p>Перетащи эту кнопку на панель закладок браузера:</p>
+        <p><a class="btn bookmarklet" href="${bookmarkletHref()}" title="Перетащи на панель закладок">→ Gvozdepedia</a></p>
+        <p>Потом открой свою колоду на Moxfield и нажми закладку — сайт откроется с готовым списком изменений.</p>
+      </details>
       <div class="form-actions">
         <button type="button" class="btn" data-act="manual" hidden>Вставить вручную</button>
         <button type="button" class="btn" data-act="close">Скрыть</button>
@@ -66,6 +75,11 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
   };
 
   closeBtn.addEventListener('click', () => dialog.close());
+  // Клик по закладке здесь ничего не даст — её нужно перетащить
+  dialog.querySelector('.bookmarklet').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Перетащи кнопку на панель закладок, а нажимай её на странице колоды на Moxfield.');
+  });
   manual.addEventListener('click', () => {
     dialog.close();
     onManual();
@@ -97,7 +111,8 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
     setStep('fetch', 'active');
 
     // Ждём, пока задача sync закончится (публикация сайта идёт следом, её не ждём)
-    const deadline = Date.now() + TIMEOUT_MS;
+    const startedAt = Date.now();
+    const deadline = startedAt + TIMEOUT_MS;
     let job;
     while (!closed && Date.now() < deadline) {
       await sleep(POLL_MS);
@@ -107,18 +122,33 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
         continue; // временная ошибка сети — пробуем ещё
       }
       if (job?.status === 'completed') break;
+      // Задача ждёт раннер: компьютер выключен или программа раннера не запущена
+      if ((!job || job.status === 'queued') && Date.now() - startedAt > QUEUED_HINT_MS && !result.dataset.waiting) {
+        result.dataset.waiting = '1';
+        result.innerHTML = `<p class="muted">Жду твой компьютер — похоже, он выключен или раннер не запущен.
+          Синхронизация выполнится, как только компьютер появится в сети. Окно можно закрыть.</p>`;
+        manual.hidden = false;
+        dialog.querySelector('.bookmarklet-hint').open = true;
+      }
     }
     if (closed) return;
 
     if (job?.status !== 'completed') {
       const { html_url: url } = await getRun(session, runId).catch(() => ({}));
-      failWith('Синхронизация идёт дольше обычного. Она продолжится на GitHub — загляни позже.', url);
+      failWith(
+        job?.status === 'queued'
+          ? 'Компьютер так и не появился в сети. Синхронизация останется в очереди и выполнится, когда он включится.'
+          : 'Синхронизация идёт дольше обычного. Она продолжится на GitHub — загляни позже.',
+        url,
+      );
       return;
     }
+    delete result.dataset.waiting;
+    result.innerHTML = '';
     if (job.conclusion !== 'success') {
       const failed = job.steps?.find((s) => s.conclusion === 'failure')?.name;
       failWith(
-        failed === 'Забрать колоду с Moxfield'
+        failed?.startsWith('Забрать колоду с Moxfield')
           ? 'Не удалось забрать колоду с Moxfield. Проверь, что она публичная и ссылка верная. Если Moxfield заблокировал запрос — используй «Вставить вручную».'
           : `Синхронизация не удалась${failed ? ` на шаге «${esc(failed)}»` : ''}.`,
         job.html_url,

@@ -832,3 +832,6 @@ button.card-tile:hover { outline: 2px solid var(--accent); }
 .sync-result:empty { display: none; }
 .sync-result p { margin: 0 0 6px; }
 .sync-result h4 { margin: 10px 0 4px; font-size: 1rem; }
+
+.bookmarklet-hint p { margin: 6px 0; }
+.bookmarklet { cursor: grab; border-style: dashed; border-color: var(--accent); color: var(--accent); }

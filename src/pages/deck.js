@@ -29,7 +29,8 @@ const setView = (v) => {
   }
 };
 
-export function deckPage(el, slug, isCurrent) {
+// importText — колода, присланная закладкой с Moxfield: сразу показываем изменения
+export function deckPage(el, slug, isCurrent, { importText } = {}) {
   const deck = findDeck(slug);
   if (!deck) return notFound(el);
   document.title = `${deck.name} — GvozdepediaMTG`;
@@ -113,6 +114,10 @@ export function deckPage(el, slug, isCurrent) {
       onManual: () => openSyncDialog({ deck, onApply: (plan) => applySync(deck, plan) }),
     }),
   );
+
+  if (importText && isEditor()) {
+    openSyncDialog({ deck, initialText: importText, onApply: (plan) => applySync(deck, plan) });
+  }
 
   load(el, deck, isCurrent);
 }

@@ -25,7 +25,7 @@ function renderPlan(plan) {
  * читать колоды напрямую, поэтому редактор копирует экспорт и вставляет сюда.
  * onApply(plan) сохраняет изменения и возвращает промис.
  */
-export function openSyncDialog({ deck, onApply }) {
+export function openSyncDialog({ deck, onApply, initialText = '' }) {
   const dialog = document.createElement('dialog');
   dialog.className = 'dialog sync-dialog';
   dialog.innerHTML = `
@@ -63,6 +63,10 @@ export function openSyncDialog({ deck, onApply }) {
     apply.disabled = !plan || plan.empty;
   };
   textarea.addEventListener('input', update);
+  if (initialText) {
+    textarea.value = initialText;
+    update();
+  }
 
   dialog.querySelector('[data-act="paste"]').addEventListener('click', async () => {
     try {

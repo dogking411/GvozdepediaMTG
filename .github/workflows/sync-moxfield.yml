@@ -1,7 +1,9 @@
 name: Sync deck from Moxfield
 run-name: Синхронизация колоды ${{ inputs.slug }}
 
-# Запускается кнопкой «Синхронизировать» на странице колоды (через GitHub API)
+# Запускается кнопкой «Синхронизировать» на странице колоды (через GitHub API).
+# Колоду забирает компьютер редактора (self-hosted runner с меткой gvozdepedia):
+# с серверов GitHub Moxfield запросы не пускает (403).
 on:
   workflow_dispatch:
     inputs:
@@ -15,42 +17,29 @@ permissions:
   pages: write
   id-token: write
 
+# Пока компьютер выключен, в очереди ждёт только последний запуск
 concurrency:
   group: moxfield-sync
   cancel-in-progress: false
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, gvozdepedia]
+    timeout-minutes: 10
     outputs:
-      changed: ${{ steps.commit.outputs.changed }}
+      changed: ${{ steps.sync.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
 
-      - name: Забрать колоду с Moxfield
-        run: node scripts/sync-moxfield.mjs "$SLUG"
+      # Node, git и curl берутся с компьютера; скрипт сам коммитит и пушит,
+      # так что шаг одинаково работает в PowerShell и bash
+      - name: Забрать колоду с Moxfield и сохранить
+        id: sync
+        run: node scripts/sync-moxfield.mjs --commit
         env:
           SLUG: ${{ inputs.slug }}
 
-      - name: Сохранить изменения
-        id: commit
-        run: |
-          if git diff --quiet; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Синхронизация с Moxfield: $SLUG"
-          git push
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-        env:
-          SLUG: ${{ inputs.slug }}
-
-  # Коммит от GITHUB_TOKEN не запускает другие workflow — публикуем сайт сами
+  # Коммит от GITHUB_TOKEN не запускает другие workflow — публикуем сайт сами (на серверах GitHub)
   deploy:
     needs: sync
     if: needs.sync.outputs.changed == 'true'
