@@ -8,7 +8,7 @@ import { fetchCards, lookup, manaSymbols, requestFor } from '../lib/scryfall.js'
 import { esc } from '../lib/html.js';
 import { renderDecklist, renderSideboard } from '../components/decklist.js';
 import { openSyncDialog } from '../components/syncDialog.js';
-import { openAutoSyncDialog } from '../components/autoSyncDialog.js';
+import { openBookmarkletDialog } from '../components/bookmarkletDialog.js';
 import { toast } from '../components/toast.js';
 import { computeStats, renderStats } from '../components/stats.js';
 import { notFound } from './misc.js';
@@ -105,12 +105,8 @@ export function deckPage(el, slug, isCurrent, { importText } = {}) {
   });
 
   el.querySelector('#sync-btn')?.addEventListener('click', () =>
-    openAutoSyncDialog({
+    openBookmarkletDialog({
       deck,
-      onDone: (text) => {
-        setPending(`${DECKS_DIR}/${deck.slug}.md`, text);
-        window.dispatchEvent(new Event('gvozd:content'));
-      },
       onManual: () => openSyncDialog({ deck, onApply: (plan) => applySync(deck, plan) }),
     }),
   );
