@@ -88,7 +88,7 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
     setStep('start', 'active');
     let runId;
     try {
-      runId = await dispatchWorkflow(session, WORKFLOW, { slug: deck.slug });
+      runId = await dispatchWorkflow(session, WORKFLOW, { slug: deck.slug }, (r) => r.display_title?.endsWith(` ${deck.slug}`));
     } catch (err) {
       failWith(dispatchError(err));
       return;

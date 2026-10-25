@@ -82,22 +82,26 @@ export function explainError(err) {
 
 // ----- GitHub Actions: запуск задачи и отслеживание её хода -----
 
-/** Запускает workflow и возвращает id запуска (нужно право Actions: Read and write). */
-export async function dispatchWorkflow({ token, repo, branch }, workflow, inputs) {
-  const startedAt = Date.now();
+/**
+ * Запускает workflow и возвращает id запуска (нужно право Actions: Read and write).
+ * isOurs(run) — как узнать наш запуск в списке (например, по run-name).
+ */
+export async function dispatchWorkflow({ token, repo, branch }, workflow, inputs, isOurs = () => true) {
+  const listRuns = async () =>
+    (await request(token, `/repos/${repo}/actions/workflows/${workflow}/runs?event=workflow_dispatch&per_page=10`))
+      .workflow_runs;
+
+  // API не возвращает id запуска, а часы компьютера могут расходиться с GitHub —
+  // поэтому запоминаем уже существующие запуски и ждём новый
+  const known = new Set((await listRuns()).map((r) => r.id));
   await request(token, `/repos/${repo}/actions/workflows/${workflow}/dispatches`, {
     method: 'POST',
     body: JSON.stringify({ ref: branch, inputs }),
   });
 
-  // API не возвращает id запуска — ищем свежий запуск в списке
-  for (let attempt = 0; attempt < 10; attempt++) {
-    await new Promise((r) => setTimeout(r, 1500));
-    const { workflow_runs: runs } = await request(
-      token,
-      `/repos/${repo}/actions/workflows/${workflow}/runs?event=workflow_dispatch&per_page=5`,
-    );
-    const run = runs.find((r) => new Date(r.created_at).getTime() >= startedAt - 15000);
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await new Promise((r) => setTimeout(r, 2000));
+    const run = (await listRuns()).find((r) => !known.has(r.id) && isOurs(r));
     if (run) return run.id;
   }
   throw new Error('Задача запущена, но не удалось найти её на GitHub. Проверь вкладку Actions в репозитории.');
