@@ -11,6 +11,7 @@ const PATHS = {
   minus: '<path d="M5 12h14"/>',
   tap: '<path d="M19.5 13A7.5 7.5 0 1 1 17 6.5"/><path d="M19.5 3.5V8H15"/>',
   untap: '<path d="M4.5 13A7.5 7.5 0 1 0 7 6.5"/><path d="M4.5 3.5V8H9"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
   reset: '<path d="M4 7h16"/><path d="M6 7l1 13h10l1-13"/><path d="M9.5 7V4h5v3"/><path d="M10 11v5M14 11v5"/>',
   gear:
     '<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>',

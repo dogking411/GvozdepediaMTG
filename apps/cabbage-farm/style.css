@@ -54,6 +54,11 @@ button { font: inherit; color: inherit; }
 .tb-btn.on { background: var(--accent-soft); color: var(--accent); }
 .tb-btn[hidden] { display: none; }
 
+/* Откат — главная кнопка панели, выделена цветом */
+.tb-btn.undo { margin-left: 4px; background: var(--accent-soft); color: var(--accent); }
+.tb-btn.undo:hover { background: var(--accent); color: var(--surface); }
+.tb-btn.undo:disabled { background: var(--surface-2); color: var(--muted); }
+
 .stepper,
 .chip {
   display: flex;

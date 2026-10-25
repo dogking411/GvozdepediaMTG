@@ -110,7 +110,35 @@ function commit(changed, ms) {
   return true;
 }
 
+// ---- откат: снимки состояния до каждого действия ----
+
+const MAX_HISTORY = 200;
+const history = [];
+const snapshot = () => JSON.stringify(state);
+
+function remember(before) {
+  history.push(before);
+  if (history.length > MAX_HISTORY) history.shift();
+  $('undo').disabled = false;
+}
+
+// Действие одним шагом истории: если ничего не изменилось, шаг не записываем
+function undoable(change, ms) {
+  const before = snapshot();
+  if (!change()) return false;
+  remember(before);
+  return commit(true, ms);
+}
+
+function undo() {
+  if (!history.length) return false;
+  Object.assign(state, JSON.parse(history.pop()));
+  for (const { id } of TOKENS) bump(id);
+  return commit(true, 12);
+}
+
 // ---- удержание: срабатывает сразу, потом повторяется всё быстрее ----
+// Всё удержание — один шаг истории: откат вернёт состояние до нажатия.
 
 function holdToRepeat(el, action) {
   let timer = 0;
@@ -129,7 +157,9 @@ function holdToRepeat(el, action) {
       /* без захвата */
     }
     stop();
+    const before = snapshot();
     if (!action()) return;
+    remember(before);
     let delay = 150;
     const tick = () => {
       if (!action()) return stop();
@@ -145,7 +175,8 @@ function holdToRepeat(el, action) {
   el.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     e.preventDefault();
-    action();
+    const before = snapshot();
+    if (action()) remember(before);
   });
 }
 
@@ -227,6 +258,7 @@ function render() {
   $('yield').hidden = !label;
   $('yield').textContent = label;
 
+  $('undo').disabled = !history.length;
   $('untap').disabled = !Object.values(state.counts).some((c) => c.tapped);
   $('reset').disabled = !Object.values(state.counts).some((c) => c.tapped || c.untapped);
 }
@@ -240,25 +272,41 @@ $('mfg-plus').innerHTML = icon('plus', 14);
 $('untap').innerHTML = icon('untap');
 $('reset').innerHTML = icon('reset');
 $('help-btn').innerHTML = icon('help');
+$('undo').innerHTML = icon('undo');
 for (const el of document.querySelectorAll('.sheet-icon[data-icon]')) el.innerHTML = icon(el.dataset.icon, 15);
 
 function setManufactors(n) {
-  state.manufactors = Math.min(MAX_MANUFACTORS, Math.max(0, n));
-  commit(true);
+  const next = Math.min(MAX_MANUFACTORS, Math.max(0, n));
+  undoable(() => {
+    if (next === state.manufactors) return false;
+    state.manufactors = next;
+    return true;
+  });
 }
 $('mfg-minus').addEventListener('click', () => setManufactors(state.manufactors - 1));
 $('mfg-plus').addEventListener('click', () => setManufactors(state.manufactors + 1));
 for (const id of ['peregrin', 'bilbo']) {
-  $(id).addEventListener('click', () => {
-    state[id] = !state[id];
-    commit(true);
-  });
+  $(id).addEventListener('click', () =>
+    undoable(() => {
+      state[id] = !state[id];
+      return true;
+    }),
+  );
 }
-$('untap').addEventListener('click', () => commit(untapAll(), 16));
+$('untap').addEventListener('click', () => undoable(untapAll, 16));
 $('reset').addEventListener('click', () => {
   if (!confirm('Убрать все токены?')) return;
-  state.counts = emptyCounts();
-  commit(true, 20);
+  undoable(() => {
+    state.counts = emptyCounts();
+    return true;
+  }, 20);
+});
+$('undo').addEventListener('click', undo);
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.code === 'KeyZ') {
+    e.preventDefault();
+    undo();
+  }
 });
 
 // ---- тема: по системе, пока пользователь не выбрал сам ----
