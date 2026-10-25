@@ -40,8 +40,12 @@ function tile(e) {
     </a>`;
 }
 
-export function renderDecklist(entries, view = 'list') {
+// commanders — командиры первой группой, как на Moxfield
+export function renderDecklist(entries, view = 'list', commanders = []) {
   const groups = groupByType(entries);
+  if (commanders.length) {
+    groups.unshift({ key: 'Commander', label: commanders.length > 1 ? 'Commanders' : 'Commander', items: commanders, count: commanders.length });
+  }
   if (view === 'grid') {
     return groups
       .map(

@@ -165,11 +165,12 @@ async function load(el, deck, isCurrent) {
     .join(' + ');
 
   const entries = deck.cards.map((c) => ({ ...c, card: lookup(map, requestFor(c)) }));
+  const commanderEntries = deck.commanderEntries.map((c) => ({ ...c, qty: 1, card: lookup(map, requestFor(c)) }));
 
   const listEl = el.querySelector('#decklist');
   const buttons = el.querySelectorAll('.segmented button');
   const show = (view) => {
-    listEl.innerHTML = renderDecklist(entries, view);
+    listEl.innerHTML = renderDecklist(entries, view, commanderEntries);
     buttons.forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   };
   buttons.forEach((b) =>
