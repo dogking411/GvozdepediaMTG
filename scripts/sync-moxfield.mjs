@@ -7,6 +7,9 @@
 
 import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+
+// Любая неожиданная ошибка (нет прав на запись, git не смог запушить…) — в журнал задачи с понятным текстом
+process.on('uncaughtException', (err) => fail(err.message));
 import { parseDeckFile, parseDecklist, parseDecklistLines, serializeDeck } from '../src/lib/deckFile.js';
 
 const args = process.argv.slice(2);

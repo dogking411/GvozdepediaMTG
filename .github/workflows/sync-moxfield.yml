@@ -29,7 +29,7 @@ jobs:
     outputs:
       changed: ${{ steps.sync.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Node, git и curl берутся с компьютера; скрипт сам коммитит и пушит,
       # так что шаг одинаково работает в PowerShell и bash

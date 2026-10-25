@@ -20,6 +20,19 @@ const STEPS = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Текст ошибки, который скрипт синхронизации написал в журнал задачи (::error::).
+// Репозиторий публичный — заметки к задаче GitHub отдаёт без токена.
+async function jobError(repo, jobId) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/check-runs/${jobId}/annotations`);
+    if (!res.ok) return '';
+    const notes = await res.json();
+    return notes.find((n) => n.annotation_level === 'failure' && !/^Process completed with exit code/.test(n.message))?.message || '';
+  } catch {
+    return '';
+  }
+}
+
 function dispatchError(err) {
   if (err.status === 403) {
     return `У токена нет права запускать задачи. Открой токен на GitHub (Settings → Developer settings → Fine-grained tokens),
@@ -167,9 +180,10 @@ export function openAutoSyncDialog({ deck, onDone, onManual }) {
     result.innerHTML = '';
     if (job.conclusion !== 'success') {
       const failed = job.steps?.find((s) => s.conclusion === 'failure')?.name;
+      const reason = await jobError(session.repo, job.id);
       failWith(
-        failed?.startsWith('Забрать колоду с Moxfield')
-          ? 'Не удалось забрать колоду с Moxfield. Проверь, что она публичная и ссылка верная. Если Moxfield заблокировал запрос — используй «Вставить вручную».'
+        reason
+          ? `Синхронизация не удалась: ${esc(reason)}`
           : `Синхронизация не удалась${failed ? ` на шаге «${esc(failed)}»` : ''}.`,
         job.html_url,
       );
