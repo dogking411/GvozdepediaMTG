@@ -63,6 +63,9 @@ export function parseDeckFile(raw, slug) {
     thoughts: sections.thoughts.trim(),
     decklistText: sections.decklist.trim(),
     cards: parseDecklist(sections.decklist, commanders),
+    commanderEntries: commanders.map(
+      (name) => parseDecklistLines(sections.decklist).find((c) => c.name.toLowerCase() === name.toLowerCase()) || { name },
+    ),
   };
 }
 
@@ -70,17 +73,21 @@ export function parseDeckFile(raw, slug) {
 //   "1 Sol Ring", "1x Sol Ring", "1 Sol Ring (CMM) 400", "1 Sol Ring (CMM) 400 *F*"
 export function parseDecklist(text, commanders = []) {
   const skip = new Set(commanders.map((c) => c.toLowerCase()));
+  return parseDecklistLines(text).filter((c) => !skip.has(c.name.toLowerCase()));
+}
+
+// Все строки деклиста, включая командира
+export function parseDecklistLines(text) {
   const cards = [];
   for (let line of text.split('\n')) {
     line = line.trim();
     if (!line || line.startsWith('//') || line.startsWith('#')) continue;
-    const m = line.match(/^(\d+)x?\s+(.+?)(?:\s+\([A-Za-z0-9]+\)(?:\s+\S+)?)?(?:\s+\*[A-Z]+\*)*$/);
+    const m = line.match(/^(\d+)x?\s+(.+?)(?:\s+\(([A-Za-z0-9]+)\)(?:\s+([^\s*]+))?)?(?:\s+\*[A-Z]+\*)*$/);
     if (!m) continue;
     const name = m[2].trim();
-    if (skip.has(name.toLowerCase())) continue;
     const existing = cards.find((c) => c.name === name);
     if (existing) existing.qty += Number(m[1]);
-    else cards.push({ qty: Number(m[1]), name });
+    else cards.push({ qty: Number(m[1]), name, ...(m[3] ? { set: m[3], number: m[4] || '' } : {}) });
   }
   return cards;
 }

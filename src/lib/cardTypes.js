@@ -1,13 +1,14 @@
 // Порядок важен: первая подходящая группа побеждает (Artifact Creature -> Существа)
 export const TYPE_GROUPS = [
   { key: 'Creature', label: 'Существа' },
+  // Земли сразу после существ: Urza's Saga (Enchantment Land) и Seat of the Synod (Artifact Land) — это земли
+  { key: 'Land', label: 'Земли' },
   { key: 'Planeswalker', label: 'Планесволкеры' },
   { key: 'Battle', label: 'Битвы' },
   { key: 'Instant', label: 'Мгновенные' },
   { key: 'Sorcery', label: 'Волшебство' },
   { key: 'Artifact', label: 'Артефакты' },
   { key: 'Enchantment', label: 'Чары' },
-  { key: 'Land', label: 'Земли' },
 ];
 
 export const OTHER_GROUP = { key: 'Other', label: 'Прочее' };

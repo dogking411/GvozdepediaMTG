@@ -1,6 +1,6 @@
 import { getDecks } from '../lib/content.js';
 import { isEditor } from '../lib/auth.js';
-import { fetchCards, lookup, manaSymbols } from '../lib/scryfall.js';
+import { fetchCards, lookup, manaSymbols, requestFor } from '../lib/scryfall.js';
 import { esc } from '../lib/html.js';
 import { renderCoolStrip } from './coolCards.js';
 
@@ -24,11 +24,11 @@ function deckTiles(el, isCurrent) {
     )
     .join('');
 
-  fetchCards(decks.flatMap((d) => d.commanders))
+  fetchCards(decks.flatMap((d) => d.commanderEntries.map(requestFor)))
     .then((map) => {
       if (!isCurrent()) return;
       for (const d of decks) {
-        const cards = d.commanders.map((n) => lookup(map, n)).filter(Boolean);
+        const cards = d.commanderEntries.map((c) => lookup(map, requestFor(c))).filter(Boolean);
         const tile = grid.querySelector(`[data-slug="${d.slug}"]`);
         if (!cards.length) continue;
         const art = tile.querySelector('.deck-tile-art');

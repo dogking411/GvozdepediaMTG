@@ -1,7 +1,7 @@
 import { marked } from 'marked';
 import { findDeck } from '../lib/content.js';
 import { isEditor } from '../lib/auth.js';
-import { fetchCards, lookup, manaSymbols } from '../lib/scryfall.js';
+import { fetchCards, lookup, manaSymbols, requestFor } from '../lib/scryfall.js';
 import { esc } from '../lib/html.js';
 import { renderDecklist } from '../components/decklist.js';
 import { computeStats, renderStats } from '../components/stats.js';
@@ -90,7 +90,7 @@ export function deckPage(el, slug, isCurrent) {
 async function load(el, deck, isCurrent) {
   let map;
   try {
-    map = await fetchCards([...deck.commanders, ...deck.cards.map((c) => c.name)]);
+    map = await fetchCards([...deck.commanderEntries, ...deck.cards].map(requestFor));
   } catch (err) {
     if (!isCurrent()) return;
     el.querySelector('#decklist').innerHTML = `<p class="error">Не удалось загрузить карты: ${esc(err.message)}</p>`;
@@ -99,7 +99,7 @@ async function load(el, deck, isCurrent) {
   }
   if (!isCurrent()) return;
 
-  const commanderCards = deck.commanders.map((name) => lookup(map, name)).filter(Boolean);
+  const commanderCards = deck.commanderEntries.map((c) => lookup(map, requestFor(c))).filter(Boolean);
   el.querySelector('#commanders').innerHTML = commanderCards.length
     ? commanderCards
         .map(
@@ -114,7 +114,7 @@ async function load(el, deck, isCurrent) {
     .map((c) => `${esc(c.name)} <span class="cost">${manaSymbols(c.manaCost)}</span>`)
     .join(' + ');
 
-  const entries = deck.cards.map((c) => ({ ...c, card: lookup(map, c.name) }));
+  const entries = deck.cards.map((c) => ({ ...c, card: lookup(map, requestFor(c)) }));
 
   const listEl = el.querySelector('#decklist');
   const buttons = el.querySelectorAll('.segmented button');

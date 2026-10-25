@@ -1,14 +1,15 @@
 import { marked } from 'marked';
 import { manaSymbols } from '../lib/scryfall.js';
 import { esc } from '../lib/html.js';
+import { mountArtPicker } from './artPicker.js';
 
 const oracle = (text) => manaSymbols(esc(text)).replace(/\n/g, '<br>');
 
 /**
  * Окно с подробностями о карте из коллекции.
- * Для редактора — правка заметки и удаление (onSave(note), onRemove() возвращают промисы).
+ * Для редактора — правка заметки, смена арта и удаление (onSave(note), onChangeArt(card), onRemove() возвращают промисы).
  */
-export function openCardDialog({ entry, card, editor, onSave, onRemove }) {
+export function openCardDialog({ entry, card, editor, onSave, onChangeArt, onRemove }) {
   const dialog = document.createElement('dialog');
   dialog.className = 'dialog card-dialog';
   const added = entry.added ? new Date(entry.added).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -21,8 +22,8 @@ export function openCardDialog({ entry, card, editor, onSave, onRemove }) {
         ${card?.backImage ? `<img src="${esc(card.backImage)}" alt="">` : ''}
       </div>
       <div class="card-dialog-info">
-        <h2>${esc(entry.name)} <span class="cost">${manaSymbols(card?.manaCost)}</span></h2>
-        ${card ? `<p class="muted">${esc(card.typeLine)}</p>` : ''}
+        <h2>${esc(entry.flavor || entry.name)} <span class="cost">${manaSymbols(card?.manaCost)}</span></h2>
+        ${card ? `<p class="muted">${entry.flavor ? `${esc(entry.name)} · ` : ''}${esc(card.typeLine)}</p>` : ''}
         ${card?.text ? `<div class="oracle">${oracle(card.text)}</div>` : ''}
 
         <h4>Чем нравится</h4>
@@ -38,11 +39,13 @@ export function openCardDialog({ entry, card, editor, onSave, onRemove }) {
           ${card?.url ? `<a class="btn" href="${esc(card.url)}" target="_blank" rel="noopener">Scryfall ↗</a>` : ''}
           ${
             editor
-              ? `<button class="btn btn-danger" data-act="remove">Убрать</button>
+              ? `<button class="btn" data-act="arts">Сменить арт</button>
+                 <button class="btn btn-danger" data-act="remove">Убрать</button>
                  <button class="btn btn-primary" data-act="save">Сохранить заметку</button>`
               : ''
           }
         </div>
+        <div class="art-picker"></div>
       </div>
     </div>
   `;
@@ -71,6 +74,11 @@ export function openCardDialog({ entry, card, editor, onSave, onRemove }) {
 
   const save = dialog.querySelector('[data-act="save"]');
   save?.addEventListener('click', () => run(save, 'Сохраняю…', () => onSave(dialog.querySelector('.note-input').value.trim())));
+
+  const arts = dialog.querySelector('[data-act="arts"]');
+  arts?.addEventListener('click', () =>
+    mountArtPicker(dialog.querySelector('.art-picker'), card, (chosen) => run(arts, 'Сохраняю…', () => onChangeArt(chosen))),
+  );
 
   const remove = dialog.querySelector('[data-act="remove"]');
   remove?.addEventListener('click', () => {

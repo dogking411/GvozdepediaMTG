@@ -1,11 +1,12 @@
 import { getCoolCards } from '../lib/content.js';
 import { isEditor } from '../lib/auth.js';
 import { updateCoolCards, sameCard, today } from '../lib/coolCards.js';
-import { fetchCards, lookup, manaSymbols } from '../lib/scryfall.js';
+import { fetchCards, lookup, manaSymbols, requestKey } from '../lib/scryfall.js';
 import { explainError } from '../lib/github.js';
 import { esc } from '../lib/html.js';
 import { mountCardSearch } from '../components/cardSearch.js';
 import { openCardDialog } from '../components/cardDialog.js';
+import { mountArtPicker } from '../components/artPicker.js';
 import { toast } from '../components/toast.js';
 
 const COLORS = ['W', 'U', 'B', 'R', 'G', 'C'];
@@ -15,6 +16,11 @@ const SORTS = {
   name: { label: 'По названию', fn: (a, b) => a.entry.name.localeCompare(b.entry.name) },
   cmc: { label: 'По мана-стоимости', fn: (a, b) => (a.card?.cmc ?? 0) - (b.card?.cmc ?? 0) },
 };
+
+// Запись коллекции: { name, id?, flavor?, note, added }. id — выбранная печать (арт).
+const entryRequest = (e) => (e.id ? { id: e.id, name: e.name } : e.name);
+const displayName = (e) => e.flavor || e.name;
+const printingFields = (card) => ({ id: card.id, ...(card.flavorName ? { flavor: card.flavorName } : {}) });
 
 const githubError = (err) => new Error(err.status ? explainError(err) : err.message);
 
@@ -60,8 +66,8 @@ export function coolCardsPage(el, isCurrent) {
     el.querySelector('#cool-count').textContent = entries.length;
     const q = state.query.toLowerCase();
     const items = entries
-      .map((entry, i) => ({ entry, i, card: lookup(cardMap, entry.name) }))
-      .filter(({ entry }) => !q || entry.name.toLowerCase().includes(q) || (entry.note || '').toLowerCase().includes(q))
+      .map((entry, i) => ({ entry, i, card: lookup(cardMap, entryRequest(entry)) }))
+      .filter(({ entry }) => !q || [entry.name, entry.flavor, entry.note].some((t) => (t || '').toLowerCase().includes(q)))
       .filter(({ card }) => {
         if (!state.colors.size) return true;
         const identity = card?.colorIdentity || [];
@@ -81,7 +87,7 @@ export function coolCardsPage(el, isCurrent) {
       .map(
         ({ entry, card }) => `
         <button type="button" class="cool-tile" data-name="${esc(entry.name)}">
-          ${card?.image ? `<img src="${esc(card.image)}" alt="${esc(entry.name)}" loading="lazy">` : `<div class="cool-tile-missing">${esc(entry.name)}</div>`}
+          ${card?.image ? `<img src="${esc(card.image)}" alt="${esc(displayName(entry))}" loading="lazy">` : `<div class="cool-tile-missing">${esc(displayName(entry))}</div>`}
           ${entry.note ? `<span class="cool-note">${esc(entry.note)}</span>` : ''}
         </button>`,
       )
@@ -91,7 +97,7 @@ export function coolCardsPage(el, isCurrent) {
   async function loadCards() {
     grid.innerHTML = '<p class="muted">Загружаю карты со Scryfall…</p>';
     try {
-      cardMap = await fetchCards(getCoolCards().map((e) => e.name));
+      cardMap = await fetchCards(getCoolCards().map(entryRequest));
     } catch (err) {
       if (isCurrent()) grid.innerHTML = `<p class="error">Не удалось загрузить карты: ${esc(err.message)}</p>`;
       return;
@@ -125,8 +131,21 @@ export function coolCardsPage(el, isCurrent) {
     if (!entry) return;
     openCardDialog({
       entry,
-      card: lookup(cardMap, entry.name),
+      card: lookup(cardMap, entryRequest(entry)),
       editor,
+      onChangeArt: async (card) => {
+        try {
+          await updateCoolCards(
+            (list) => list.map((x) => (sameCard(x.name, entry.name) ? { ...x, flavor: undefined, ...printingFields(card) } : x)),
+            `Крутые карты: новый арт для ${entry.name}`,
+          );
+        } catch (err) {
+          throw githubError(err);
+        }
+        cardMap.set(requestKey({ id: card.id }), card);
+        toast('Арт обновлён.');
+        renderGrid();
+      },
       onSave: async (note) => {
         try {
           await updateCoolCards(
@@ -167,8 +186,10 @@ export function coolCardsPage(el, isCurrent) {
         <div class="pick">
           ${card.image ? `<img src="${esc(card.image)}" alt="${esc(card.name)}" ${card.backImage ? `data-img="${esc(card.image)}" data-back="${esc(card.backImage)}"` : ''}>` : ''}
           <div class="pick-info">
-            <h3>${esc(card.name)} <span class="cost">${manaSymbols(card.manaCost)}</span></h3>
-            <p class="muted">${esc(card.typeLine)}</p>
+            <h3>${esc(card.flavorName || card.name)} <span class="cost">${manaSymbols(card.manaCost)}</span></h3>
+            <p class="muted">${card.flavorName ? `${esc(card.name)} · ` : ''}${esc(card.typeLine)}</p>
+            <p class="muted small">${esc(card.setName || '')}${card.number ? ` · #${esc(card.number)}` : ''}
+              · <button type="button" class="link-btn" data-act="arts">Выбрать другой арт</button></p>
             ${
               exists
                 ? '<p class="accent">Эта карта уже есть в коллекции.</p>'
@@ -183,7 +204,12 @@ export function coolCardsPage(el, isCurrent) {
               ${exists ? '' : '<button type="button" class="btn btn-primary" data-act="add">Добавить в коллекцию</button>'}
             </div>
           </div>
-        </div>`;
+        </div>
+        <div class="art-picker"></div>`;
+
+      pick.querySelector('[data-act="arts"]').addEventListener('click', () =>
+        mountArtPicker(pick.querySelector('.art-picker'), card, (chosen) => showPick(chosen)),
+      );
 
       pick.querySelector('[data-act="cancel"]').addEventListener('click', () => {
         pick.innerHTML = '';
@@ -200,7 +226,7 @@ export function coolCardsPage(el, isCurrent) {
         add.textContent = 'Добавляю…';
         try {
           await updateCoolCards(
-            (list) => (list.some((x) => sameCard(x.name, card.name)) ? list : [...list, { name: card.name, note, added: today() }]),
+            (list) => (list.some((x) => sameCard(x.name, card.name)) ? list : [...list, { name: card.name, ...printingFields(card), note, added: today() }]),
             `Крутые карты: ${card.name}`,
           );
         } catch (err) {
@@ -210,10 +236,10 @@ export function coolCardsPage(el, isCurrent) {
           add.textContent = 'Добавить в коллекцию';
           return;
         }
-        cardMap.set(card.name.toLowerCase().split(' // ')[0], card);
+        cardMap.set(requestKey({ id: card.id }), card);
         pick.innerHTML = '';
         search.clear();
-        toast(`«${card.name}» добавлена в крутые карты!`);
+        toast(`«${card.flavorName || card.name}» добавлена в крутые карты!`);
         renderGrid();
         search.focus();
       });
@@ -236,12 +262,12 @@ export function renderCoolStrip(container, isCurrent, limit = 8) {
     container.closest('section')?.remove();
     return;
   }
-  fetchCards(latest.map((e) => e.name))
+  fetchCards(latest.map(entryRequest))
     .then((map) => {
       if (!isCurrent()) return;
       container.innerHTML = latest
         .map((entry) => {
-          const card = lookup(map, entry.name);
+          const card = lookup(map, entryRequest(entry));
           return card?.image
             ? `<a class="strip-card" href="#/cards" data-img="${esc(card.image)}" title="${esc(entry.name)}"><img src="${esc(card.image)}" alt="${esc(entry.name)}" loading="lazy"></a>`
             : '';

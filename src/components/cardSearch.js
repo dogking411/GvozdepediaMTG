@@ -18,7 +18,7 @@ export function mountCardSearch(root, { onPick }) {
       </div>
       <ul class="ac-list" id="ac-list" role="listbox" hidden></ul>
     </div>
-    <p class="search-hint muted">Выбери подсказку или нажми Enter, чтобы искать по <a href="https://scryfall.com/docs/syntax" target="_blank" rel="noopener">синтаксису Scryfall</a>.</p>
+    <p class="search-hint muted">Выбери подсказку или нажми Enter — так найдутся и альтернативные названия (Fangorn Forest), и запросы по <a href="https://scryfall.com/docs/syntax" target="_blank" rel="noopener">синтаксису Scryfall</a>.</p>
     <div class="search-results"></div>
   `;
 
