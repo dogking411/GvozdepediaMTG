@@ -35,6 +35,10 @@ button { font: inherit; color: inherit; }
 .bar-group { display: flex; align-items: center; gap: 6px; }
 .effects { flex: 1; justify-content: center; flex-wrap: wrap; }
 
+/* Много эффектов — они занимают отдельную строку под заголовком и кнопками */
+.topbar.stacked { justify-content: space-between; }
+.topbar.stacked .effects { order: 3; flex-basis: 100%; }
+
 .title { font-weight: 700; letter-spacing: 0.01em; }
 
 .tb-btn {
@@ -108,10 +112,11 @@ button { font: inherit; color: inherit; }
 /* ---- панели токенов ---- */
 
 .panels {
+  --num-size: clamp(48px, min(46cqw, 22vh), 168px);
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(var(--cols), 1fr);
   gap: 1px;
   background: var(--border);
 }
@@ -119,6 +124,7 @@ button { font: inherit; color: inherit; }
 .panel {
   position: relative;
   overflow: hidden;
+  container-type: inline-size;
   background: var(--bg);
 }
 
@@ -162,6 +168,7 @@ button { font: inherit; color: inherit; }
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .face {
@@ -180,13 +187,15 @@ button { font: inherit; color: inherit; }
   align-items: center;
   gap: 8px;
   color: var(--tone);
-  font-size: clamp(18px, 2.4vw, 26px);
+  font-size: clamp(15px, 9cqw, 26px);
   font-weight: 700;
 }
 .name span { color: var(--text); }
 
+/* Длинные числа уменьшаются, чтобы влезать в панель */
 .num {
-  font-size: clamp(64px, min(16vw, 22vh), 168px);
+  --digits: 1;
+  font-size: min(var(--num-size), calc(92cqw / (var(--digits) * 0.66)));
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -200,15 +209,26 @@ button { font: inherit; color: inherit; }
   align-items: center;
   gap: 6px;
   color: var(--tone);
-  font-size: clamp(18px, 2.6vw, 28px);
+  font-size: clamp(16px, 8cqw, 28px);
   font-variant-numeric: tabular-nums;
 }
 .tapped.zero { color: var(--muted); opacity: 0.45; }
 
-/* Телефон вертикально — панели одна под другой */
+@container (max-width: 190px) {
+  .zone { padding: 10px; }
+  .hint { gap: 3px; font-size: 10px; letter-spacing: 0.04em; }
+}
+
+/* Телефон вертикально: три панели — одна под другой, пять — в две колонки */
 @media (max-width: 720px) and (orientation: portrait) {
-  .panels { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); }
-  .num { font-size: clamp(56px, 13vh, 120px); }
+  .panels { --num-size: clamp(56px, 13vh, 120px); }
+  .panels[data-count='3'] { grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr); }
+  .panels[data-count='5'] {
+    --num-size: clamp(48px, 10.5vh, 96px);
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+  .panels[data-count='5'] .panel:last-child { grid-column: 1 / -1; }
   .name { font-size: 18px; }
   .tapped { font-size: 18px; }
 }
@@ -259,8 +279,9 @@ button { font: inherit; color: inherit; }
   border-radius: 8px;
   background: var(--surface-2);
   color: var(--text-2);
+  font-size: 13px;
+  font-weight: 700;
 }
-.sheet-letter { font-size: 13px; font-weight: 700; }
 
 .sheet-close {
   width: 100%;

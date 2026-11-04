@@ -13,6 +13,7 @@ export default defineConfig({
         main: page('index.html'),
         apps: page('apps/index.html'),
         cabbageFarm: page('apps/cabbage-farm/index.html'),
+        tokenFarm: page('apps/token-farm/index.html'),
       },
     },
   },
