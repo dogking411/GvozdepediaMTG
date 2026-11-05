@@ -355,8 +355,10 @@ code { background: var(--surface-2); padding: 1px 6px; border-radius: 6px; font-
   transition: transform 0.15s, border-color 0.15s;
 }
 .deck-tile:hover { transform: translateY(-2px); border-color: var(--accent); text-decoration: none; }
-.deck-tile-art { aspect-ratio: 16 / 9; background-size: cover; background-position: center 25%; }
-.deck-tile-art.partners { background-size: 50% 100%, 50% 100%; background-position: left center, right center; background-repeat: no-repeat; }
+.deck-tile-art { aspect-ratio: 16 / 9; display: flex; gap: 2px; overflow: hidden; }
+.art-part { flex: 1 1 0; min-width: 0; overflow: hidden; }
+.art-part img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; display: block; }
+.art-part.tall img { height: 160%; object-position: center top; }
 .deck-tile-body { padding: 12px 16px 14px; }
 .deck-tile-body p { margin: 2px 0 0; font-size: 0.85rem; }
 .identity { margin-top: 8px; }

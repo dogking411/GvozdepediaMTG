@@ -33,8 +33,16 @@ function deckTiles(el, isCurrent) {
         if (!cards.length) continue;
         const art = tile.querySelector('.deck-tile-art');
         art.classList.remove('skeleton');
-        art.style.backgroundImage = cards.map((c) => `url("${c.art}")`).join(', ');
-        if (cards.length > 1) art.classList.add('partners');
+        // Картинки, а не фон: object-fit обрезает арт по рамке, не растягивая его
+        art.innerHTML = cards
+          .map((c) => `<span class="art-part"><img src="${esc(c.art)}" alt="${esc(c.name)}" loading="lazy"></span>`)
+          .join('');
+        // У full-art печатей в «арт» Scryfall попадает текст карты — у таких картинок показываем только верх
+        art.querySelectorAll('img').forEach((img) => {
+          const mark = () => img.parentElement.classList.toggle('tall', img.naturalHeight >= img.naturalWidth);
+          if (img.complete) mark();
+          else img.addEventListener('load', mark);
+        });
         const ids = [...new Set(cards.flatMap((c) => c.colorIdentity))];
         tile.querySelector('.deck-tile-body').insertAdjacentHTML(
           'beforeend',
